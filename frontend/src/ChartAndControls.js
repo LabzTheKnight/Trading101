@@ -6,13 +6,10 @@ const ChartAndControls = ({
   chartContainerRef,
   candlestickSeries,
   setCandlestickSeries,
-  currentIndex,
   setCurrentIndex,
   startDate,
   timeInterval,
   setClickedPoint,
-  setTotalPnL,
-  setTrades,
   handleTrade,
   addNewCandle
 }) => {
@@ -157,10 +154,31 @@ const removeProjection = (id) => {
         <button onClick={() => setProjectionMode('short')} style={{ backgroundColor: projectionMode === 'short' ? 'red' : 'lightgray', color: 'white', padding: '10px', marginLeft: '10px' }}>
           Short Mode
         </button>
-        <button onClick={() => handleTrade('buy')} style={{ backgroundColor: 'green', color: 'white', padding: '10px', marginLeft: '10px' }}>
+        <button 
+          onClick={() => handleTrade('buy')} // Change this
+          style={{ 
+            backgroundColor: 'green', 
+            color: 'white', 
+            padding: '10px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
           Buy
         </button>
-        <button onClick={() => handleTrade('sell')} style={{ backgroundColor: 'red', color: 'white', padding: '10px', marginLeft: '10px' }}>
+        <button 
+          onClick={() => handleTrade('sell')} // And this
+          style={{ 
+            backgroundColor: 'red', 
+            color: 'white', 
+            padding: '10px',
+            marginLeft: '10px',
+            border: 'none',
+            borderRadius: '4px',
+            cursor: 'pointer'
+          }}
+        >
           Sell
         </button>
         <button onClick={addNewCandle} style={{ backgroundColor: 'blue', color: 'white', padding: '10px', marginLeft: '10px' }}>

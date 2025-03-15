@@ -297,8 +297,8 @@ def close_trade():
 @app.route('/api/backtest', methods=['POST'])
 def get_next_candlestick():
     time_interval = int(request.json.get('timeInterval', 1))
-
-
+    current_index = request.json.get('currentIndex', 0)
+   
     # Select the right file
     file_map = {
         1: 'EURUSD1.csv',
@@ -307,36 +307,29 @@ def get_next_candlestick():
         30: 'EURUSD30.csv',
         60: 'EURUSD60.csv'
     }
-
-
+   
     csv_filename = file_map.get(time_interval, 'EURUSD1.csv')
     csv_path = os.path.join(os.path.dirname(__file__), csv_filename)
-
-
+   
     if not os.path.exists(csv_path):
         return jsonify({'error': f'File {csv_filename} not found'}), 404
-
-
-    if trading_system.historical_data is None:
+       
+    # Only load data if it's not already loaded or if the time interval changed
+    if trading_system.historical_data is None or getattr(trading_system, 'current_interval', None) != time_interval:
         trading_system.load_historical_data(csv_path)
-
-
-    df = trading_system.load_historical_data(csv_path)
-    df['datetime'] = pd.to_datetime(df['datetime'])
-    df = df.set_index('datetime')
-
-
-    data = df[['time', 'open', 'high', 'low', 'close']].to_dict(orient='records')
-    current_index = request.json.get('currentIndex', 0)
-
-
+        trading_system.current_interval = time_interval
+   
+    # Use the already loaded data
+    data = trading_system.historical_data[['time', 'open', 'high', 'low', 'close']].to_dict(orient='records')
+   
     if current_index >= len(data):
         return jsonify({'error': 'No more data'}), 400
-
-
+   
     trading_system.current_candle = data[current_index]
     current_price = float(trading_system.current_candle['close'])
     pnl = trading_system.update_trades(current_price)
+
+
 
 
     # Add indices to trades in the response
@@ -347,6 +340,8 @@ def get_next_candlestick():
         trades_with_index.append(trade_dict)
 
 
+
+
     return jsonify({
         'nextCandlestick': trading_system.current_candle,
         'nextIndex': current_index + 1,
@@ -355,9 +350,6 @@ def get_next_candlestick():
         'currentPrice': current_price
     })
 
-
-
-
 # Initialize the system when the server starts
 csv_path = os.path.join(os.path.dirname(__file__), 'EURUSD1.csv')
 if os.path.exists(csv_path):
@@ -365,5 +357,5 @@ if os.path.exists(csv_path):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
 

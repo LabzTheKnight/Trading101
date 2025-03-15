@@ -29,11 +29,17 @@ const ChartAndControls = ({
       height: 400,
       layout: { backgroundColor: '#ffffff', textColor: '#333' },
       grid: { vertLines: { color: '#eee' }, horzLines: { color: '#eee' } },
-      priceScale: { minMove: 0.0001 },
+      priceFormat: { precision:5 , minMove: 0.00001 },
       timeScale: { timeVisible: true, secondsVisible: false, borderColor: '#ccc' },
     });
 
-    const series = newChart.addCandlestickSeries();
+    const series = newChart.addCandlestickSeries({
+      priceFormat: { 
+        type: 'price',
+        precision: 5, 
+        minMove: 0.00001 
+      }
+    });
     setCandlestickSeries(series);
     setChart(newChart);
 
